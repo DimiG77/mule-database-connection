@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="global-error-handlingError_Handler" doc:id="39d3bd6c-c08a-47d2-be10-94bb6e2c8a5d" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="72b3e5fc-425d-4940-af8e-b70108e04778" type="EMPLOYEE:EMPLOYEE_NOT_FOUND">
+			<ee:transform doc:name="Transform Message" doc:id="e241b4b0-abd1-49e7-ba69-088f0cdb2bb7" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": 404,
+	"message": "Employee with this ID does not exist",
+	"Description": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9e1cbc13-f121-4968-b18f-211abfdba9fd" type="EXPRESSION">
+			<ee:transform doc:name="Transform Message" doc:id="82800ac3-c53a-43cf-88a2-f6a9f3aaf4d4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"status": 400,
+	"message": "Wrong Exrpession",
+	"Description": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

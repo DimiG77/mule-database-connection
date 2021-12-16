@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="fetchEmployee_byID" doc:id="c2978dcb-742e-4275-b941-5c3916eb428f" >
+		<logger level="INFO" doc:name="Start Log" doc:id="8b3c20c5-d96c-4beb-8324-9e9c42fc1631" message="Start Log"/>
+		<db:select doc:name="Select" doc:id="23e2040c-2b6e-433a-ba3c-dab649a37545" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM emp_master WHERE EMP_ID = :empid]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	empid: attributes.queryParams.empid
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="893b9a69-1167-45a3-8d3f-ac423d092133" >
+			<when expression="#[not isEmpty(payload.EMP_ID)]">
+				<ee:transform doc:name="Transform Message" doc:id="a837bad2-3060-455a-a666-e50a848783f6">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+employees: {
+	employee: payload 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error EMPLOYEE:NOT_EMPLOYEE_FOUND" doc:id="e7b8f15a-a953-43cd-a3e8-cfbb3c9ae638" type="EMPLOYEE:EMPLOYEE_NOT_FOUND"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End log" doc:id="c3d61570-e01f-4392-8734-703c815bad0a" message="End log"/>
+	</flow>
+	<flow name="addEmployee" doc:id="0d9d7b8a-b89c-44bb-a272-acdb204e2dce" >
+		<logger level="INFO" doc:name="Start log" doc:id="bac011b9-a9a9-4d97-9db2-95d98d7e08d5" message="Start log"/>
+		<ee:transform doc:name="Transform Message" doc:id="adba2b73-edff-4473-b564-8bc039108c5a">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map((item) -> {
+	employee_id: item.employeeId,
+	employee_status: item.employeeStatus, 
+	employee_email: item.employeeMail,
+	employee_address: item.employeeAddress,
+	employee_salary: item.employeeSalary, 
+	employee_name: item.employeeName,
+	employee_phone: item.employeePhone
+	
+})]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="b97e889c-ed14-4e99-9d90-12b1f416d60d" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO emp_master(EMP_ID, EMP_NAME, EMP_ADDRESS, STATUS, EMP_EMAIL, EMP_SALARY, EMP_PHONE) VALUES (:employee_id,  :employee_name, :employee_address, :employee_status, :employee_email, :employee_salary, :employee_phone)]]></db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Success Message" doc:id="49f38a30-5c03-4d5b-b78c-3c7b46efee42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status: 201,
+	message: "success adding new employees"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Log" doc:id="eef86a6b-ecda-4497-824a-8eacfc391c93" message="End Log"/>
+	</flow>
+</mule>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <employees>
+      <employee>
+          <employeeId>100</employeeId>
+          <employeeName>Markos</employeeName>
+          <employeePhone>697414444</employeePhone>
+          <employeeMail>mark@gmail.com</employeeMail>
+          <employeeSalary>1980</employeeSalary>
+          <employeeAddress>GR</employeeAddress>
+      </employee>
+  </employees>

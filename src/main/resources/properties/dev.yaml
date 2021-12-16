@@ -1,0 +1,11 @@
+api:
+  apiDiscovery: "17509643"
+https:
+  host: "localhost"
+  port: "8082"
+db:
+  host: "sql5.freemysqlhosting.net"
+  port: "3306"
+  user: "![pesJkvkulavvmoVEBX9qBg==]"
+  password: "![kIsVsU7nCbFGYpesBCZDmw==]"
+  database: "sql5459289"

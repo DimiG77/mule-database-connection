@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <apikit:config name="employee-onboard-config" api="api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<http:listener-config name="HTTP_Listener_config_api" doc:name="HTTP Listener config" doc:id="c2c96ac0-f119-422a-b5f1-911aa2029d68" >
+		<http:listener-connection host="${secure::https.host}" port="${secure::https.port}" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store path="keystore-emp-onboard.jks" alias="mule" keyPassword="password" password="password" type="jks"/>
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="3c28f701-fcc1-4479-b805-563105b05eaf" file="properties/${env}.yaml" key="${enc.key}" />
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="9979ac39-81c3-487a-b890-2035bdbdfb6d" >
+		<db:my-sql-connection host="${secure::db.host}" port="${secure::db.port}" user="${secure::db.user}" password="${secure::db.password}" database="${secure::db.database}" />
+	</db:config>
+	<configuration doc:name="Configuration" doc:id="ed9af359-97ee-4679-84b0-d0e55ae85ce8" defaultErrorHandler-ref="global-error-handlingError_Handler" />
+	<api-gateway:autodiscovery apiId="${secure::api.apiDiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="87ced2eb-8a1c-406e-81f0-b48f9a95c81c" flowRef="employee-onboard-main" />
+	
+	
+</mule>

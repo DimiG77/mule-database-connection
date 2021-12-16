@@ -1,0 +1,92 @@
+#%RAML 1.0
+title: Employee Onboard
+description: Employee Onboarding API
+traits:
+  client-id-required:
+    headers:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+    responses:
+      401:
+        description: Unauthorized or invalid client application credentials
+      500:
+        description: Bad response from authorization server, or WSDL SOAP Fault error
+
+/add-employee:
+  description: Add an new employee to Database
+  post:
+    is: [client-id-required]
+    body:
+      application/json:
+        example: !include examples/addEmployeeExample.json
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/200.json
+
+      500:
+        body:
+          application/json:
+            example: !include examples/500.json
+/update-employee:
+  description: Update employee
+  patch:
+    is: [client-id-required]
+    body:
+      application/xml:
+        example: !include examples/updateEmplyee.xml
+    responses:
+      200:
+        body:
+          application/xml:
+            example: !include examples/200.xml
+      500:
+        body:
+          application/xml:
+            example: !include examples/500.xml
+                                      
+/fetch-employee:
+  get:
+    is: [client-id-required]
+    description: Fetch Employee
+    queryParameters:
+      empid:
+        displayName: empid
+        required: true
+        type: integer
+        example: 0
+      status:
+        displayName: Status
+        required: false
+        type: string
+        example: "A"
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/addEmployeeExample.json          
+      404:
+        body:
+          application/json:
+            example: !include examples/404.json
+      500:
+        body:
+          application/json:
+            example: !include examples/500.json
+/delete-employee:
+  /{empid}:
+    get:
+      is: [client-id-required]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/200.json
+        500:
+          body:
+            application/json:
+              example: !include examples/500.json 
+   
